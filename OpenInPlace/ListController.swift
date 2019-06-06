@@ -93,10 +93,13 @@ class ListController: UITableViewController, UIDocumentPickerDelegate, NSFilePre
             NSFileCoordinator.addFilePresenter(self)
         }
         
-        
-        if let split = splitViewController {
-            let controllers = split.viewControllers
-            detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? EditController
+        if let split = splitViewController,
+           let last = split.viewControllers.last,
+           let nav = last as? UINavigationController,
+           let top = nav.topViewController,
+           let edit = top as? EditController {
+            
+            detailViewController = edit
         }
     }
     
@@ -136,6 +139,14 @@ class ListController: UITableViewController, UIDocumentPickerDelegate, NSFilePre
                 controller.url = urls[indexPath.row]
                 controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
                 controller.navigationItem.leftItemsSupplementBackButton = true
+            }
+        }
+
+        if segue.identifier == "document" {
+            if let indexPath = tableView.indexPathForSelectedRow,
+               let controller = segue.destination as? DocumentController {
+                
+                controller.url = urls[indexPath.row]
             }
         }
     }
